@@ -1,0 +1,56 @@
+.modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(2px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 4px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 1px solid #e0ddd5;
+      text-align: center;
+      animation: slideUp 0.2s ease-out;
+    }
+
+    .modal-title {
+      font-family: 'Times New Roman', serif;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #1c1c1c;
+    }
+
+    .modal-message {
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    /* Reuse Button Styles from Global if possible, or define locally */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 2px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-outline { background: transparent; border: 1px solid #ccc; color: #333; }
+    .btn-danger { background: #d93025; color: white; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

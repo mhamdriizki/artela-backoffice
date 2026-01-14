@@ -1,24 +1,35 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { DataInvitationResponse, InvitationResponse, InvitationService } from '../../core/services/invitation-service';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { BaseResponse } from '../../core/models/BaseResponse';
+import { InvitationService } from '../../core/services/invitation-service';
+import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+
+// Interface Invitation
+interface Invitation {
+  slug: string;
+  couple_name: string;
+  theme: string;
+  created_at: string;
+}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink],
-  templateUrl: './dashboard.html',
   standalone: true,
-  styleUrl: './dashboard.scss',
+  imports: [CommonModule, RouterLink, ConfirmDialog], // Import Component Baru
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.scss'
 })
-export class Dashboard implements OnInit, OnDestroy {
+export class Dashboard implements OnInit {
   private invService = inject(InvitationService);
+  private cdr = inject(ChangeDetectorRef);
 
-  invitations: InvitationResponse[] = [];
+  invitations: Invitation[] = [];
   isLoading = true;
   errorMessage = '';
-  destroySubject: Subject<void> = new Subject<void>();
+
+  // State untuk Modal Delete
+  showDeleteModal = false;
+  slugToDelete = '';
 
   ngOnInit() {
     this.loadData();
@@ -26,38 +37,63 @@ export class Dashboard implements OnInit, OnDestroy {
 
   loadData() {
     this.isLoading = true;
-    this.invService
-      .getAll()
-      .pipe(
-        takeUntil(this.destroySubject),
-        finalize(() => (this.isLoading = false))
-      )
-      .subscribe({
-        next: (res: BaseResponse<DataInvitationResponse>) => {
-          // Validasi Data Aman
-          if (res.error_schema.error_code === 'ART-00-000') {
-            this.invitations = res.output_schema.data;
-            console.log('Invitations loaded: ', this.invitations);
-          } else {
-            this.invitations = [];
-          }
-        },
-        error: (err) => {
-          console.error('Error loading data:', err);
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    this.invService.getAll().subscribe({
+      next: (res: any) => {
+        if (res && res.output_schema && Array.isArray(res.output_schema.data)) {
+          this.invitations = res.output_schema.data;
+        } else {
+          this.invitations = [];
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.errorMessage = 'Sesi habis. Silakan login ulang.';
+        } else {
           this.errorMessage = 'Gagal memuat data.';
-          this.isLoading = false;
-        },
-      });
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  onDelete(slug: string) {
-    if (confirm(`Hapus undangan "${slug}"?`)) {
-      this.invService.delete(slug).subscribe(() => this.loadData());
-    }
+  // 1. Trigger saat tombol Hapus ditekan (Buka Modal)
+  onDeleteRequest(slug: string) {
+    this.slugToDelete = slug;
+    this.showDeleteModal = true;
   }
 
-  ngOnDestroy(): void {
-    this.destroySubject.next();
-    this.destroySubject.complete();
+  // 2. Eksekusi Hapus (Dipanggil dari Modal)
+  onConfirmDelete() {
+    if (!this.slugToDelete) return;
+
+    // Tutup modal dulu biar smooth
+    this.showDeleteModal = false;
+    this.isLoading = true; // Set loading state table
+    this.cdr.detectChanges();
+
+    this.invService.delete(this.slugToDelete).subscribe({
+      next: () => {
+        // Auto fetch data terbaru
+        this.loadData();
+        this.slugToDelete = '';
+      },
+      error: (err) => {
+        alert('Gagal menghapus data.'); // Fallback alert error
+        this.isLoading = false;
+        this.loadData();
+      }
+    });
+  }
+
+  // 3. Batal Hapus
+  onCancelDelete() {
+    this.showDeleteModal = false;
+    this.slugToDelete = '';
   }
 }

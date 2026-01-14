@@ -1,0 +1,14 @@
+<div class="modal-overlay" (click)="onCancel()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Konfirmasi Hapus</h3>
+        <p class="modal-message">
+          Apakah Anda yakin ingin menghapus undangan <strong>{{ itemName }}</strong>?
+          <br>Tindakan ini tidak dapat dibatalkan.
+        </p>
+
+        <div class="modal-actions">
+          <button (click)="onCancel()" class="btn btn-outline">Batal</button>
+          <button (click)="onConfirm()" class="btn btn-danger">Ya, Hapus</button>
+        </div>
+      </div>
+    </div>

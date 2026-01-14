@@ -1,28 +1,33 @@
 <div class="container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+
+  <div class="header-section">
     <div>
-      <h1 style="margin: 0; font-family: sans-serif;">Backoffice Artela</h1>
-      <p style="margin-top: 5px; color: #666;">Kelola daftar undangan digital</p>
+      <h1>Backoffice Artela</h1>
+      <p>Kelola daftar undangan digital</p>
     </div>
     <button routerLink="/create" class="btn btn-primary">
       + Buat Undangan
     </button>
   </div>
 
-  @if(isLoading) {
-    <p>haha</p>
-  } @else {
-    <p>{{invitations[0].slug}}</p>
-  }
-  <!-- @if (isLoading) {
-    <div style="text-align: center; padding: 50px; color: #666;">
-      <p>Sedang memuat data...</p>
+  @if (isLoading) {
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Mengambil data...</p>
     </div>
   }
 
-  @if (!isLoading && invitations.length === 0) {
-    <div style="text-align: center; padding: 50px; border: 2px dashed #ccc;">
-      <p>Belum ada undangan.</p>
+  @if (!isLoading && errorMessage) {
+    <div class="state-box error">
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadData()" class="btn btn-sm btn-outline">Coba Lagi</button>
+    </div>
+  }
+
+  @if (!isLoading && !errorMessage && invitations.length === 0) {
+    <div class="state-box empty">
+      <h3>Belum Ada Undangan</h3>
+      <p>Silakan buat undangan pertama Anda.</p>
     </div>
   }
 
@@ -41,23 +46,15 @@
         <tbody>
           @for (item of invitations; track item.slug) {
             <tr>
-              <td>
-                <span style="font-weight: 600; color: #000;">{{ item.slug }}</span>
-              </td>
-              <td>
-                {{ item.couple_name ? item.couple_name : '(Belum diset)' }}
-              </td>
-              <td>
-                <span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; color: #333;">
-                  {{ item.theme }}
-                </span>
-              </td>
+              <td><span class="slug-text">{{ item.slug }}</span></td>
+              <td>{{ item.couple_name ? item.couple_name : '(Belum diset)' }}</td>
+              <td><span class="badge-theme">{{ item.theme }}</span></td>
               <td>{{ item.created_at }}</td>
               <td style="text-align: right;">
                 <button [routerLink]="['/edit', item.slug]" class="btn btn-sm btn-outline" style="margin-right: 8px;">
                   Edit
                 </button>
-                <button (click)="onDelete(item.slug)" class="btn btn-sm btn-danger">
+                <button (click)="onDeleteRequest(item.slug)" class="btn btn-sm btn-danger">
                   Hapus
                 </button>
               </td>
@@ -66,5 +63,14 @@
         </tbody>
       </table>
     </div>
-  } -->
+  }
+
+  @if (showDeleteModal) {
+    <app-confirm-dialog
+      [itemName]="slugToDelete"
+      (confirm)="onConfirmDelete()"
+      (cancel)="onCancelDelete()">
+    </app-confirm-dialog>
+  }
+
 </div>
