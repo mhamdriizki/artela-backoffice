@@ -1,0 +1,70 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <h1 style="margin: 0; font-family: sans-serif;">Backoffice Artela</h1>
+      <p style="margin-top: 5px; color: #666;">Kelola daftar undangan digital</p>
+    </div>
+    <button routerLink="/create" class="btn btn-primary">
+      + Buat Undangan
+    </button>
+  </div>
+
+  @if(isLoading) {
+    <p>haha</p>
+  } @else {
+    <p>{{invitations[0].slug}}</p>
+  }
+  <!-- @if (isLoading) {
+    <div style="text-align: center; padding: 50px; color: #666;">
+      <p>Sedang memuat data...</p>
+    </div>
+  }
+
+  @if (!isLoading && invitations.length === 0) {
+    <div style="text-align: center; padding: 50px; border: 2px dashed #ccc;">
+      <p>Belum ada undangan.</p>
+    </div>
+  }
+
+  @if (!isLoading && invitations.length > 0) {
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Slug URL</th>
+            <th style="width: 25%;">Nama Pasangan</th>
+            <th style="width: 15%;">Tema</th>
+            <th style="width: 15%;">Dibuat</th>
+            <th style="width: 20%; text-align: right;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of invitations; track item.slug) {
+            <tr>
+              <td>
+                <span style="font-weight: 600; color: #000;">{{ item.slug }}</span>
+              </td>
+              <td>
+                {{ item.couple_name ? item.couple_name : '(Belum diset)' }}
+              </td>
+              <td>
+                <span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; color: #333;">
+                  {{ item.theme }}
+                </span>
+              </td>
+              <td>{{ item.created_at }}</td>
+              <td style="text-align: right;">
+                <button [routerLink]="['/edit', item.slug]" class="btn btn-sm btn-outline" style="margin-right: 8px;">
+                  Edit
+                </button>
+                <button (click)="onDelete(item.slug)" class="btn btn-sm btn-danger">
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } -->
+</div>

@@ -1,0 +1,199 @@
+/* --- VARIABLES --- */
+    :root {
+      --font-serif: 'Times New Roman', Times, serif;
+      --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --color-primary: #1c1c1c;
+    }
+
+    /* --- LAYOUT & TYPOGRAPHY --- */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: #fdfbf7; /* Warm White */
+      min-height: 100vh;
+    }
+
+    .serif-title {
+      font-family: var(--font-serif, 'Times New Roman');
+      font-size: 2.2rem;
+      color: #1c1c1c;
+      margin-bottom: 0.5rem;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      color: #666;
+      font-family: var(--font-sans, sans-serif);
+      margin-bottom: 2rem;
+    }
+
+    /* --- CARD FORM --- */
+    .card-form {
+      background: #fff;
+      border: 1px solid #e0ddd5;
+      padding: 2rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .form-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+
+      &:last-child { border-bottom: none; }
+    }
+
+    .section-title {
+      font-family: var(--font-serif, 'Times New Roman');
+      font-size: 1.2rem;
+      color: #1c1c1c;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-left: 3px solid #c5a059; /* Gold Accent */
+      padding-left: 10px;
+    }
+
+    /* --- INPUTS --- */
+    .form-group { margin-bottom: 1.2rem; }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #444;
+      font-family: var(--font-sans, sans-serif);
+    }
+
+    .required { color: #d93025; }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      font-size: 1rem;
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #1c1c1c;
+        background: #fafafa;
+      }
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      background: #f9f9f9;
+
+      .prefix {
+        padding: 0 12px;
+        color: #777;
+        font-size: 0.9rem;
+        background: #eee;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid #ccc;
+      }
+
+      input {
+        border: none;
+        flex: 1;
+        &:focus { outline: none; background: #fff; }
+      }
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      .col { flex: 1; }
+    }
+
+    /* --- UPLOAD BOX --- */
+    .upload-box {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      border-radius: 4px;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      cursor: pointer;
+      input { display: none; }
+
+      span {
+        background: #fff;
+        border: 1px solid #999;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: 0.2s;
+        &:hover { background: #eee; border-color: #333; }
+      }
+    }
+
+    .file-list {
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    .file-item {
+      font-size: 0.9rem;
+      background: #fff;
+      padding: 6px 10px;
+      margin-bottom: 5px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hint-text, .empty-text {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    /* --- ACTIONS --- */
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: #1c1c1c;
+      color: #fff;
+      border: 1px solid #1c1c1c;
+      &:hover { background: #000; }
+      &:disabled { opacity: 0.7; cursor: not-allowed; }
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #ccc;
+      color: #333;
+      &:hover { border-color: #333; background: #fff; }
+    }

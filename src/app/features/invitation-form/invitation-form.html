@@ -1,0 +1,92 @@
+<div class="container">
+
+      <div class="header-section">
+        <h1 class="serif-title">{{ isEdit ? 'Edit Undangan' : 'Buat Undangan Baru' }}</h1>
+        <p class="subtitle">Isi detail pernikahan mempelai di bawah ini.</p>
+      </div>
+
+      <div class="card-form">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <div class="form-section">
+            <h3 class="section-title">Info Utama</h3>
+
+            <div class="form-group">
+              <label>Slug URL <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="prefix">artela.id/invitation/</span>
+                <input formControlName="slug" class="form-control" placeholder="rizki-pearly">
+              </div>
+              @if (form.get('slug')?.invalid && form.get('slug')?.touched) {
+                <small class="error-text">Slug wajib diisi (tanpa spasi).</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Tema <span class="required">*</span></label>
+              <select formControlName="theme" class="form-control">
+                <option value="netflix">Netflix</option>
+                <option value="instagram">Instagram</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Data Mempelai</h3>
+
+            <div class="form-group">
+              <label>Judul Pasangan (Header) <span class="required">*</span></label>
+              <input formControlName="couple_name" class="form-control" placeholder="Rizki & Pearly">
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label>Nama Pria</label>
+                  <input formControlName="groom_name" class="form-control" placeholder="Rizki">
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label>Nama Wanita</label>
+                  <input formControlName="bride_name" class="form-control" placeholder="Pearly">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Galeri Foto</h3>
+
+            <div class="upload-box">
+              <label class="upload-btn">
+                <input type="file" multiple (change)="onFileSelect($event)" accept="image/png, image/jpeg">
+                <span>+ Pilih Foto (Max 5)</span>
+              </label>
+
+              <div class="file-list">
+                @if (selectedFiles.length === 0) {
+                  <p class="empty-text">Belum ada file dipilih.</p>
+                } @else {
+                  @for (file of selectedFiles; track file.name) {
+                    <div class="file-item">
+                      <span class="file-icon">📷</span>
+                      <span class="file-name">{{ file.name }}</span>
+                    </div>
+                  }
+                }
+              </div>
+              <p class="hint-text">Format: JPG/PNG. Foto akan diupload setelah tombol Simpan ditekan.</p>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button type="button" routerLink="/dashboard" class="btn btn-outline">Batal</button>
+            <button type="submit" [disabled]="form.invalid || isLoading" class="btn btn-primary">
+              {{ isLoading ? 'Menyimpan...' : 'Simpan Undangan' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>

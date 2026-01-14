@@ -1,1 +1,141 @@
-/* You can add global styles to this file, and also import other style files */
+/* ========================================
+   GLOBAL STYLES - ARTELA HOME THEME (ELEGANT)
+   ======================================== */
+
+:root {
+  /* --- Palette Warna (Warm/Elegant) --- */
+  --color-bg-body: #fdfbf7;       /* Warm White (Khas Undangan) */
+  --color-bg-card: #ffffff;       /* Putih Bersih */
+  --color-border: #e0ddd5;        /* Border halus kecoklatan */
+
+  --color-text-main: #2c2c2c;     /* Hitam soft (Bukan hitam pekat) */
+  --color-text-muted: #7a7a7a;    /* Abu-abu tua */
+
+  /* --- Brand Color --- */
+  --color-primary: #1c1c1c;       /* Hitam Elegan untuk Tombol */
+  --color-primary-hover: #000000;
+  --color-accent: #c5a059;        /* Gold Accent (Opsional) */
+  --color-danger: #d93025;
+
+  /* --- Spacing --- */
+  --border-radius: 4px;           /* Radius kotak tegas (Classic) */
+  --container-width: 1100px;
+}
+
+/* RESET */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body, html {
+  height: 100%;
+  background-color: var(--color-bg-body);
+  color: var(--color-text-main);
+
+  /* FONT ARTELA HOME (SERIF - ELEGANT) */
+  font-family: 'Times New Roman', Times, serif;
+  /* Fallback ke serif biar kesan undangan terasa */
+
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* SANS-SERIF untuk UI Elements (Tombol/Input) biar tetap terbaca jelas */
+button, input, select, .sans-serif {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* UTILITIES */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+h1, h2, h3 {
+  font-weight: 400; /* Font serif biasanya bagus di regular/light */
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+}
+
+/* BUTTONS (Modern Clean) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 2px; /* Kotak tegas */
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: 'Helvetica Neue', sans-serif; /* Pakai sans-serif biar rapi */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+  &:hover { background-color: var(--color-primary-hover); }
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: #999;
+  color: var(--color-text-main);
+  &:hover { border-color: #333; background-color: #fff; }
+}
+
+.btn-danger {
+  background-color: #fff;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  &:hover { background-color: var(--color-danger); color: #fff; }
+}
+
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+/* TABLE STYLES (Clean Minimalist) */
+.table-wrapper {
+  margin-top: 2rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Helvetica Neue', sans-serif; /* Table isi pakai sans-serif biar jelas */
+
+  th, td {
+    padding: 16px 24px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  th {
+    background-color: #fbfbfb;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  td { font-size: 0.95rem; color: #444; }
+  tr:last-child td { border-bottom: none; }
+}
+
+/* FORM STYLES */
+.form-control {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 1rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  &:focus { outline: none; border-color: var(--color-primary); }
+}
