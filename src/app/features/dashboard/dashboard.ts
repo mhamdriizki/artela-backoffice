@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { InvitationService } from '../../core/services/invitation-service';
+import { AuthService } from '../../core/services/auth-service';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 
 // Interface Invitation
@@ -15,12 +16,13 @@ interface Invitation {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ConfirmDialog], // Import Component Baru
+  imports: [CommonModule, RouterLink, ConfirmDialog],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
   private invService = inject(InvitationService);
+  private authService = inject(AuthService); // Inject Auth Service
   private cdr = inject(ChangeDetectorRef);
 
   invitations: Invitation[] = [];
@@ -62,38 +64,40 @@ export class Dashboard implements OnInit {
     });
   }
 
-  // 1. Trigger saat tombol Hapus ditekan (Buka Modal)
   onDeleteRequest(slug: string) {
     this.slugToDelete = slug;
     this.showDeleteModal = true;
   }
 
-  // 2. Eksekusi Hapus (Dipanggil dari Modal)
   onConfirmDelete() {
     if (!this.slugToDelete) return;
 
-    // Tutup modal dulu biar smooth
     this.showDeleteModal = false;
-    this.isLoading = true; // Set loading state table
+    this.isLoading = true;
     this.cdr.detectChanges();
 
     this.invService.delete(this.slugToDelete).subscribe({
       next: () => {
-        // Auto fetch data terbaru
         this.loadData();
         this.slugToDelete = '';
       },
       error: (err) => {
-        alert('Gagal menghapus data.'); // Fallback alert error
+        alert('Gagal menghapus data.');
         this.isLoading = false;
         this.loadData();
       }
     });
   }
 
-  // 3. Batal Hapus
   onCancelDelete() {
     this.showDeleteModal = false;
     this.slugToDelete = '';
+  }
+
+  // LOGIC LOGOUT
+  onLogout() {
+    if(confirm('Apakah Anda yakin ingin keluar?')) {
+      this.authService.logout();
+    }
   }
 }

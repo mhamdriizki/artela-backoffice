@@ -23,25 +23,36 @@ export class InvitationForm implements OnInit {
   currentSlug = '';
 
   // States Loading
-  isLoading = false;      // Untuk proses Submit ke Server
-  loadingText = '';       // Teks dinamis (Menyimpan / Uploading)
-  isCompressing = false;  // Untuk proses Kompresi Client-side
+  isLoading = false;
+  loadingText = '';
+  isCompressing = false;
 
   // State Foto
-  existingGallery: any[] = []; // Foto dari DB { id: string, filename: string }
-  newFiles: File[] = [];       // Foto baru (Client side)
+  existingGallery: any[] = [];
+  newFiles: File[] = [];
 
   // State Modal
   showSizeWarning = false;
   showDeleteConfirm = false;
-  photoIdToDelete: string | null = null; // Update: UUID String
+  photoIdToDelete: string | null = null;
 
+  // FORM GROUP UPDATED (youtube_url removed)
   form = this.fb.group({
     slug: ['', Validators.required],
     theme: ['netflix', Validators.required],
     couple_name: ['', Validators.required],
     groom_name: [''],
     bride_name: [''],
+
+    // Detail Acara
+    wedding_date: [''],
+    akad_location: [''],
+    akad_map_url: [''],
+    reception_location: [''],
+    reception_map_url: [''],
+
+    // Multimedia (Hanya Backsound)
+    background_music_url: ['']
   });
 
   ngOnInit() {
@@ -59,12 +70,14 @@ export class InvitationForm implements OnInit {
 
     this.invService.getOne(this.currentSlug).subscribe({
       next: (res: any) => {
-        // Backend Go return JSON keys lowercase (sesuai struct json tags)
         const data = res.output_schema;
+
+        if (data.wedding_date) {
+            data.wedding_date = data.wedding_date.split('T')[0];
+        }
 
         this.form.patchValue(data);
 
-        // Mapping Gallery
         if (data.gallery && Array.isArray(data.gallery)) {
           this.existingGallery = data.gallery;
         }
@@ -77,30 +90,25 @@ export class InvitationForm implements OnInit {
     });
   }
 
-  // --- 1. Logic Upload & Kompresi + Animation ---
+  // --- 1. Logic Upload & Kompresi ---
   async onFileSelect(event: any) {
-    console.log(event);
-    if (event.target.files && event.target.files[0].size > 2000000) {
-      this.showSizeWarning = true; // Modal Error
-      return;
-    } else if (event.target.files && event.target.files.length > 0) {
-      this.isCompressing = true; // Mulai animasi loading
+    if (event.target.files && event.target.files.length > 0) {
+      this.isCompressing = true;
       const rawFiles = Array.from(event.target.files) as File[];
 
       for (const file of rawFiles) {
         try {
-          // Kompresi (Max 2MB)
           const compressed = await compressImage(file, 2);
           this.newFiles.push(compressed);
         } catch (error: any) {
           if (error.message === 'FILE_TOO_LARGE') {
-            this.showSizeWarning = true; // Modal Error
+            this.showSizeWarning = true;
           } else {
             console.error('Compression error:', error);
           }
         }
       }
-      this.isCompressing = false; // Selesai animasi
+      this.isCompressing = false;
     }
   }
 
@@ -108,7 +116,7 @@ export class InvitationForm implements OnInit {
     this.newFiles.splice(index, 1);
   }
 
-  // --- 2. Logic Hapus Foto (UUID) ---
+  // --- 2. Logic Hapus Foto ---
   requestDeletePhoto(id: string) {
     this.photoIdToDelete = id;
     this.showDeleteConfirm = true;
@@ -121,7 +129,6 @@ export class InvitationForm implements OnInit {
 
       this.invService.deleteGalleryImage(this.photoIdToDelete).subscribe({
         next: () => {
-          // Update UI lokal (Hard Delete effect)
           this.existingGallery = this.existingGallery.filter(img => img.id !== this.photoIdToDelete);
           this.isLoading = false;
           this.closeDialogs();
@@ -144,6 +151,10 @@ export class InvitationForm implements OnInit {
 
     const payload = this.form.getRawValue();
 
+    if (payload.wedding_date) {
+         payload.wedding_date = new Date(payload.wedding_date).toISOString();
+    }
+
     if (this.isEdit) {
       this.invService.update(this.currentSlug, payload).subscribe({
         next: () => this.handleUploadAndFinish(this.currentSlug),
@@ -159,7 +170,7 @@ export class InvitationForm implements OnInit {
 
   private handleUploadAndFinish(slug: string) {
     if (this.newFiles.length > 0) {
-      this.loadingText = `Mengupload ${this.newFiles.length} Foto...`; // Update Status Loading
+      this.loadingText = `Mengupload ${this.newFiles.length} Foto...`;
 
       this.invService.uploadGallery(slug, this.newFiles).subscribe({
         next: () => {
@@ -168,7 +179,6 @@ export class InvitationForm implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          // Cek Error Code khusus dari Backend (ART-98-007)
           if (err.error?.error_schema?.error_code === 'ART-98-007') {
             alert('GAGAL UPLOAD: Salah satu file melebihi batas 2MB (Ditolak Server).');
           } else {

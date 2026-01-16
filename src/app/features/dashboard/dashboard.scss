@@ -18,6 +18,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap; /* Agar aman saat layar kecil */
+  gap: 15px;
 
   h1 {
     font-size: 1.8rem;
@@ -29,6 +31,11 @@
     margin: 0;
     color: #666;
   }
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
 }
 
 /* State Boxes (Loading/Error/Empty) */
@@ -136,4 +143,99 @@
 .btn-primary { background: #222; color: #fff; padding: 10px 20px; }
 .btn-outline { background: transparent; border: 1px solid #ccc; color: #333; padding: 6px 12px; }
 .btn-danger { background: #ff6b6b; color: white; padding: 6px 12px; }
+
+.btn-outline-danger {
+    background: transparent;
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+    padding: 10px 20px;
+
+    &:hover {
+        background: #fff5f5;
+        color: #e03131;
+        border-color: #e03131;
+    }
+}
+
 .btn-sm { font-size: 0.85rem; }
+
+/* =========================================
+   RESPONSIVE (MOBILE) STYLES
+   ========================================= */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+
+  /* Header jadi tumpuk */
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+
+  /* Table Transpose (Card View) */
+  .table-container {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+  }
+
+  .admin-table {
+    display: block;
+
+    /* Sembunyikan Header Table Asli */
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: block;
+      background: #fff;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: right;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+
+      &:last-child {
+        border-bottom: none;
+        background: #fdfdfd;
+        justify-content: flex-end; /* Tombol aksi di kanan */
+      }
+
+      /* Tampilkan Label Kolom via attribute data-label */
+      &::before {
+        content: attr(data-label);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: #888;
+        margin-right: 15px;
+        text-align: left;
+      }
+    }
+  }
+}

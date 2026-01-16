@@ -5,9 +5,16 @@
       <h1>Backoffice Artela</h1>
       <p>Kelola daftar undangan digital</p>
     </div>
-    <button routerLink="/create" class="btn btn-primary">
-      + Buat Undangan
-    </button>
+
+    <div class="header-actions">
+      <button (click)="onLogout()" class="btn btn-outline-danger">
+        Keluar
+      </button>
+
+      <button routerLink="/create" class="btn btn-primary">
+        + Buat Undangan
+      </button>
+    </div>
   </div>
 
   @if (isLoading) {
@@ -46,11 +53,19 @@
         <tbody>
           @for (item of invitations; track item.slug) {
             <tr>
-              <td><span class="slug-text">{{ item.slug }}</span></td>
-              <td>{{ item.couple_name ? item.couple_name : '(Belum diset)' }}</td>
-              <td><span class="badge-theme">{{ item.theme }}</span></td>
-              <td>{{ item.created_at }}</td>
-              <td style="text-align: right;">
+              <td data-label="Slug URL">
+                <span class="slug-text">{{ item.slug }}</span>
+              </td>
+              <td data-label="Nama Pasangan">
+                {{ item.couple_name ? item.couple_name : '(Belum diset)' }}
+              </td>
+              <td data-label="Tema">
+                <span class="badge-theme">{{ item.theme }}</span>
+              </td>
+              <td data-label="Dibuat">
+                {{ item.created_at }}
+              </td>
+              <td data-label="Aksi" style="text-align: right;">
                 <button [routerLink]="['/edit', item.slug]" class="btn btn-sm btn-outline" style="margin-right: 8px;">
                   Edit
                 </button>
