@@ -101,7 +101,7 @@
           <div class="gallery-grid">
             @for (img of existingGallery; track img.id) {
               <div class="photo-card">
-                <img [src]="'http://localhost:3000/uploads/' + img.filename" alt="Foto">
+                <img [src]="baseFileName + img.filename" alt="Foto">
 
                 <button type="button" class="btn-delete-img" (click)="requestDeletePhoto(img.id)" title="Hapus Foto">
                   🗑️

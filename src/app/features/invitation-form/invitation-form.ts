@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { InvitationService } from '../../core/services/invitation-service';
 import { compressImage } from '../../core/utils/image-compressor';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-invitation-form',
@@ -30,6 +31,7 @@ export class InvitationForm implements OnInit {
   // State Foto
   existingGallery: any[] = [];
   newFiles: File[] = [];
+  baseFileName = '';
 
   // State Modal
   showSizeWarning = false;
@@ -57,6 +59,7 @@ export class InvitationForm implements OnInit {
 
   ngOnInit() {
     this.currentSlug = this.route.snapshot.paramMap.get('slug') || '';
+    this.baseFileName = environment.BASE_API + '/uploads/';
     if (this.currentSlug) {
       this.isEdit = true;
       this.form.get('slug')?.disable();
