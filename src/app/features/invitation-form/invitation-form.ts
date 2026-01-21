@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { InvitationService } from '../../core/services/invitation-service';
 import { compressImage } from '../../core/utils/image-compressor';
 import { environment } from '../../../environments/environment';
+import { switchMap, of, catchError, tap, Observable } from 'rxjs';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
@@ -24,48 +25,41 @@ export class InvitationForm implements OnInit {
   currentSlug = '';
   isLoading = false;
   loadingText = '';
-  isCompressing = false; // Flag untuk loading kompresi
+  isCompressing = false;
 
-  // State Foto Gallery
+  // Data State
   existingGallery: any[] = [];
   newFiles: File[] = [];
+  guestbooks: any[] = [];
 
-  // State Foto Mempelai (Single Upload)
+  // Single Photos State
   groomFile: File | null = null;
   brideFile: File | null = null;
   previewGroom: string | null = null;
   previewBride: string | null = null;
-
-  // State Guestbook
-  guestbooks: any[] = [];
 
   // Modals
   showSizeWarning = false;
   showDeleteConfirm = false;
   photoIdToDelete: string | null = null;
 
+  baseUrl = environment.BASE_API;
+
   form = this.fb.group({
     slug: ['', Validators.required],
     theme: ['netflix', Validators.required],
     couple_name: ['', Validators.required],
-
-    // Data Mempelai
     groom_name: [''],
     bride_name: [''],
-
-    // Detail Acara
+    // Tanggal dalam format YYYY-MM-DD
     wedding_date: [''],
     akad_location: [''],
     akad_map_url: [''],
     reception_location: [''],
     reception_map_url: [''],
-
-    // Multimedia
     youtube_url: [''],
     background_music_url: ['']
   });
-
-  baseUrl = environment.BASE_API;
 
   ngOnInit() {
     this.currentSlug = this.route.snapshot.paramMap.get('slug') || '';
@@ -84,41 +78,33 @@ export class InvitationForm implements OnInit {
       next: (res: any) => {
         const data = res.output_schema;
 
-        // Format Date agar muncul di input type="date"
+        // Format Wedding Date (ambil YYYY-MM-DD saja)
         if (data.wedding_date) {
-          data.wedding_date = data.wedding_date.split('T')[0];
+           data.wedding_date = data.wedding_date.split('T')[0];
         }
 
         this.form.patchValue(data);
         this.existingGallery = data.gallery || [];
-        this.guestbooks = data.guestbooks || []; // Load Komentar
+        this.guestbooks = data.guestbooks || [];
 
-        // Set Preview Foto Mempelai
-        if (data.groom_photo) {
-           this.previewGroom = `${this.baseUrl}/uploads/${data.groom_photo}`;
-        }
-        if (data.bride_photo) {
-           this.previewBride = `${this.baseUrl}/uploads/${data.bride_photo}`;
-        }
+        if (data.groom_photo) this.previewGroom = `${this.baseUrl}/uploads/${data.groom_photo}`;
+        if (data.bride_photo) this.previewBride = `${this.baseUrl}/uploads/${data.bride_photo}`;
 
         this.isLoading = false;
       },
       error: () => {
-        alert('Gagal mengambil data.');
         this.router.navigate(['/dashboard']);
       }
     });
   }
 
-  // --- 1. Logic Upload Single File (Groom/Bride) ---
+  // --- HANDLER FOTO MEMPELAI ---
   async onSingleFileSelect(event: any, type: 'groom' | 'bride') {
     const file = event.target.files[0];
     if (file) {
       this.isCompressing = true;
       try {
         const compressed = await compressImage(file, 2); // Max 2MB
-
-        // Buat Preview Local
         const reader = new FileReader();
         reader.onload = (e: any) => {
           if (type === 'groom') {
@@ -131,28 +117,24 @@ export class InvitationForm implements OnInit {
           this.isCompressing = false;
         };
         reader.readAsDataURL(compressed);
-
       } catch (err) {
         this.isCompressing = false;
-        alert('File terlalu besar atau gagal diproses');
+        alert('Gagal memproses gambar');
       }
     }
   }
 
-  // --- 2. Logic Upload Gallery (Multiple) ---
+  // --- HANDLER GALLERY ---
   async onGallerySelect(event: any) {
     if (event.target.files && event.target.files.length > 0) {
       this.isCompressing = true;
       const rawFiles = Array.from(event.target.files) as File[];
-
       for (const file of rawFiles) {
         try {
           const compressed = await compressImage(file, 2);
           this.newFiles.push(compressed);
         } catch (error: any) {
-          if (error.message === 'FILE_TOO_LARGE') {
-            this.showSizeWarning = true;
-          }
+          if (error.message === 'FILE_TOO_LARGE') this.showSizeWarning = true;
         }
       }
       this.isCompressing = false;
@@ -163,7 +145,6 @@ export class InvitationForm implements OnInit {
     this.newFiles.splice(index, 1);
   }
 
-  // --- Logic Delete Gallery ---
   requestDeletePhoto(id: string) {
     this.photoIdToDelete = id;
     this.showDeleteConfirm = true;
@@ -172,8 +153,6 @@ export class InvitationForm implements OnInit {
   confirmDeletePhoto() {
     if (this.photoIdToDelete) {
       this.isLoading = true;
-      this.loadingText = 'Menghapus foto...';
-
       this.invService.deleteGalleryImage(this.photoIdToDelete).subscribe({
         next: () => {
           this.existingGallery = this.existingGallery.filter(img => img.id !== this.photoIdToDelete);
@@ -181,76 +160,11 @@ export class InvitationForm implements OnInit {
           this.closeDialogs();
         },
         error: () => {
-          alert('Gagal menghapus foto.');
           this.isLoading = false;
           this.closeDialogs();
+          alert('Gagal hapus foto');
         }
       });
-    }
-  }
-
-  // --- 3. Submit Form (Multipart/FormData) ---
-  onSubmit() {
-    if (this.form.invalid) return;
-
-    this.isLoading = true;
-    this.loadingText = 'Menyimpan Data...';
-
-    const formData = new FormData();
-    const rawData = this.form.getRawValue();
-
-    // Append Text Data
-    Object.keys(rawData).forEach(key => {
-        const value = rawData[key as keyof typeof rawData];
-        if (value !== null && value !== undefined) {
-            // Khusus Wedding Date, pastikan ISO String jika perlu
-            if (key === 'wedding_date' && value) {
-                 formData.append(key, new Date(value).toISOString());
-            } else {
-                 formData.append(key, String(value));
-            }
-        }
-    });
-
-    // Append Single Files (Groom/Bride)
-    // Key harus sesuai dengan handler backend: 'groom_photo_file', 'bride_photo_file'
-    if (this.groomFile) formData.append('groom_photo_file', this.groomFile);
-    if (this.brideFile) formData.append('bride_photo_file', this.brideFile);
-
-    // Eksekusi Create / Update
-    if (this.isEdit) {
-      this.invService.update(this.currentSlug, formData).subscribe({
-        next: () => this.handleGalleryUpload(this.currentSlug),
-        error: () => { this.isLoading = false; alert('Gagal Update'); }
-      });
-    } else {
-      // Untuk create, ambil slug dari form value karena slug belum ada di URL
-      const slugToSend = rawData.slug || '';
-      this.invService.create(formData).subscribe({
-        next: () => this.handleGalleryUpload(slugToSend),
-        error: () => { this.isLoading = false; alert('Gagal Create'); }
-      });
-    }
-  }
-
-  private handleGalleryUpload(slug: string) {
-    if (this.newFiles.length > 0) {
-      this.loadingText = `Mengupload ${this.newFiles.length} Foto Gallery...`;
-
-      this.invService.uploadGallery(slug, this.newFiles).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.router.navigate(['/dashboard']);
-        },
-        error: () => {
-          this.isLoading = false;
-          alert('Data tersimpan, tapi sebagian foto gallery gagal terupload.');
-          this.router.navigate(['/dashboard']);
-        }
-      });
-    } else {
-      this.isLoading = false;
-      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -258,5 +172,72 @@ export class InvitationForm implements OnInit {
     this.showSizeWarning = false;
     this.showDeleteConfirm = false;
     this.photoIdToDelete = null;
+  }
+
+  // --- SUBMIT UTAMA ---
+  onSubmit() {
+    if (this.form.invalid) return;
+
+    this.isLoading = true;
+    this.loadingText = 'Menyimpan Data Teks...';
+
+    const formData = this.form.getRawValue();
+    // Pastikan Wedding Date dikirim sebagai ISO String (RFC3339) ke Backend
+    // Backend Go expect: 2025-08-17T00:00:00Z
+    if (formData.wedding_date) {
+        const d = new Date(formData.wedding_date);
+        (formData as any).wedding_date = d.toISOString();
+    }
+
+    let saveObs: Observable<any>;
+    // Tentukan Create atau Update
+    if (this.isEdit) {
+        saveObs = this.invService.update(this.currentSlug, formData);
+    } else {
+        saveObs = this.invService.create(formData);
+    }
+
+    saveObs.pipe(
+        // 1. Setelah Save Teks Sukses, Lanjut Upload Foto Mempelai
+        tap(() => this.loadingText = 'Mengupload Foto Mempelai...'),
+        switchMap((res: any) => {
+            // Jika create, slug diambil dari response atau form
+            // Jika update, pakai currentSlug
+            const targetSlug = this.isEdit ? this.currentSlug : formData.slug;
+
+            // Cek apakah ada foto mempelai yg perlu diupload
+            if (this.groomFile || this.brideFile) {
+                return this.invService.uploadCouplePhotos(targetSlug || '', this.groomFile, this.brideFile)
+                   .pipe(
+                       catchError(err => {
+                           console.error('Foto mempelai gagal', err);
+                           // Return null agar stream tidak putus, cuma foto yg gagal
+                           return of(null);
+                       }),
+                       // Teruskan slug untuk step berikutnya
+                       switchMap(() => of(targetSlug))
+                   );
+            }
+            return of(targetSlug);
+        }),
+        // 2. Lanjut Upload Gallery
+        tap(() => this.loadingText = 'Mengupload Gallery...'),
+        switchMap((slug: any) => {
+            if (this.newFiles.length > 0 && slug) {
+                return this.invService.uploadGallery(slug, this.newFiles);
+            }
+            return of(true);
+        })
+    ).subscribe({
+        next: () => {
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+            console.error(err);
+            this.isLoading = false;
+            alert('Terjadi kesalahan saat menyimpan data.');
+        }
+    });
   }
 }
