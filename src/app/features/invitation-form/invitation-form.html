@@ -1,180 +1,291 @@
 <div class="container">
-
   <div class="header-section">
     <h1>{{ isEdit ? 'Edit Undangan' : 'Buat Undangan Baru' }}</h1>
-    <p class="subtitle">Lengkapi data mempelai, detail acara, dan galeri foto.</p>
+    <p class="subtitle">
+      Lengkapi detail pernikahan Anda dengan desain yang elegan.
+    </p>
   </div>
 
   <div class="card-form">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
       <div class="form-section">
-        <h3 class="section-title">Info Utama</h3>
-        <div class="form-group">
-          <label>Slug URL <span class="required">*</span></label>
-          <div class="input-wrapper">
-            <span class="prefix">artela.id/</span>
-            <input formControlName="slug" class="form-control" placeholder="rizki-pearly">
+        <h3 class="section-title">Informasi Dasar</h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Slug URL <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="prefix">artela.id/</span>
+              <input
+                formControlName="slug"
+                class="form-control"
+                placeholder="rizki-pearly"
+              />
+            </div>
+            <small class="hint">Alamat unik undangan Anda.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Tema <span class="required">*</span></label>
+            <select formControlName="theme" class="form-control select-input">
+              <option value="netflix">🎬 Netflix Theme</option>
+              <option value="instagram">📸 Instagram Theme</option>
+            </select>
           </div>
         </div>
-        <div class="form-group">
-          <label>Tema <span class="required">*</span></label>
-          <select formControlName="theme" class="form-control">
-            <option value="netflix">Netflix</option>
-            <option value="instagram">Instagram</option>
-          </select>
-        </div>
+
         <div class="form-group">
           <label>Judul Pasangan</label>
-          <input formControlName="couple_name" class="form-control" placeholder="Rizki & Pearly">
+          <input
+            formControlName="couple_name"
+            class="form-control"
+            placeholder="Rizki & Pearly"
+          />
         </div>
       </div>
 
       <div class="form-section">
-        <h3 class="section-title">Data Mempelai</h3>
-        <div class="row">
-          <div class="col">
-            <label>Nama Pria</label>
-            <input formControlName="groom_name" class="form-control" placeholder="Rizki">
+        <h3 class="section-title">Mempelai</h3>
+
+        <div class="couple-grid">
+          <div class="couple-card">
+            <label class="avatar-uploader" [class.has-image]="!!previewGroom">
+              <input
+                type="file"
+                (change)="onSingleFileSelect($event, 'groom')"
+                accept="image/*"
+                class="hidden-input"
+              />
+
+              @if (previewGroom) {
+              <img [src]="previewGroom" class="avatar-preview" alt="Groom" />
+              <div class="overlay">
+                <span>Ganti Foto</span>
+              </div>
+              } @else {
+              <div class="placeholder">
+                <span class="icon">🤵</span>
+                <span>Upload Foto Pria</span>
+              </div>
+              }
+            </label>
+            <div class="couple-inputs">
+              <label>Nama Pria</label>
+              <input
+                formControlName="groom_name"
+                class="form-control"
+                placeholder="Nama Lengkap"
+              />
+            </div>
           </div>
-          <div class="col">
-            <label>Nama Wanita</label>
-            <input formControlName="bride_name" class="form-control" placeholder="Pearly">
+
+          <div class="couple-card">
+            <label class="avatar-uploader" [class.has-image]="!!previewBride">
+              <input
+                type="file"
+                (change)="onSingleFileSelect($event, 'bride')"
+                accept="image/*"
+                class="hidden-input"
+              />
+
+              @if (previewBride) {
+              <img [src]="previewBride" class="avatar-preview" alt="Bride" />
+              <div class="overlay">
+                <span>Ganti Foto</span>
+              </div>
+              } @else {
+              <div class="placeholder">
+                <span class="icon">👰</span>
+                <span>Upload Foto Wanita</span>
+              </div>
+              }
+            </label>
+            <div class="couple-inputs">
+              <label>Nama Wanita</label>
+              <input
+                formControlName="bride_name"
+                class="form-control"
+                placeholder="Nama Lengkap"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <div class="form-section">
-        <h3 class="section-title">Detail Acara & Lokasi</h3>
+        <h3 class="section-title">Detail Acara</h3>
 
         <div class="form-group">
-            <label>Tanggal Pernikahan</label>
-            <input type="date" formControlName="wedding_date" class="form-control">
+          <label>Tanggal Pernikahan</label>
+          <input
+            type="date"
+            formControlName="wedding_date"
+            class="form-control date-input"
+          />
         </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label>Lokasi Akad</label>
-                    <input formControlName="akad_location" class="form-control" placeholder="Masjid Agung...">
-                </div>
+        <div class="location-grid">
+          <div class="location-box">
+            <h4>Akad Nikah</h4>
+            <div class="form-group">
+              <input
+                formControlName="akad_location"
+                class="form-control"
+                placeholder="Nama Lokasi / Gedung"
+              />
             </div>
-            <div class="col">
-                <div class="form-group">
-                    <label>Link Maps Akad</label>
-                    <input formControlName="akad_map_url" class="form-control" placeholder="https://goo.gl/maps/...">
-                </div>
+            <div class="form-group">
+              <input
+                formControlName="akad_map_url"
+                class="form-control"
+                placeholder="Link Google Maps"
+              />
             </div>
-        </div>
+          </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label>Lokasi Resepsi</label>
-                    <input formControlName="reception_location" class="form-control" placeholder="Hotel Ballroom...">
-                </div>
+          <div class="location-box">
+            <h4>Resepsi</h4>
+            <div class="form-group">
+              <input
+                formControlName="reception_location"
+                class="form-control"
+                placeholder="Nama Lokasi / Gedung"
+              />
             </div>
-            <div class="col">
-                <div class="form-group">
-                    <label>Link Maps Resepsi</label>
-                    <input formControlName="reception_map_url" class="form-control" placeholder="https://goo.gl/maps/...">
-                </div>
+            <div class="form-group">
+              <input
+                formControlName="reception_map_url"
+                class="form-control"
+                placeholder="Link Google Maps"
+              />
             </div>
+          </div>
         </div>
       </div>
 
       <div class="form-section">
         <h3 class="section-title">Multimedia</h3>
-
         <div class="form-group">
-            <label>Link Backsound (Youtube)</label>
-            <input formControlName="background_music_url" class="form-control" placeholder="https://youtube.com/watch?v=...">
-            <small style="color: #666; font-size: 0.8rem;">Masukkan link video Youtube untuk dijadikan lagu latar (Audio Only).</small>
+          <label>Link Backsound (Youtube)</label>
+          <input
+            formControlName="background_music_url"
+            class="form-control"
+            placeholder="https://youtube.com/..."
+          />
         </div>
       </div>
 
       <div class="form-section">
         <h3 class="section-title">Galeri Foto</h3>
 
-        @if (existingGallery.length > 0) {
-          <label class="sub-label">Foto Tersimpan:</label>
-          <div class="gallery-grid">
-            @for (img of existingGallery; track img.id) {
-              <div class="photo-card">
-                <img [src]="baseFileName + img.filename" alt="Foto">
-
-                <button type="button" class="btn-delete-img" (click)="requestDeletePhoto(img.id)" title="Hapus Foto">
-                  🗑️
-                </button>
-              </div>
-            }
-          </div>
-        }
-
-        <div class="upload-area">
-          <label class="sub-label">Upload Foto Baru (Maksimal 7 Foto, Max 2MB/file):</label>
-
-          <label class="upload-btn" [class.disabled]="isCompressing">
-            <input type="file" multiple (change)="onFileSelect($event)" accept="image/png, image/jpeg" [disabled]="isCompressing">
-            @if (isCompressing) {
-               <span>⏳ Memproses...</span>
-            } @else {
-               <span>+ Pilih Foto</span>
-            }
-          </label>
-
-          @if (isCompressing) {
-            <div class="processing-indicator">
-              <div class="spinner-small"></div>
-              <span>Sedang mengompres foto...</span>
-            </div>
-          }
-
-          @if (newFiles.length > 0) {
-            <div class="new-files-list">
-              @for (file of newFiles; track file.name; let i = $index) {
-                <div class="file-item">
-                  <div class="file-info">
-                    <strong>{{ file.name }}</strong>
-                    <span class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</span>
-                  </div>
-                  <button type="button" class="btn-remove-small" (click)="removeNewFile(i)">Batal</button>
-                </div>
+        <div class="gallery-container">
+          <label class="gallery-dropzone" [class.disabled]="isCompressing">
+            <input
+              type="file"
+              multiple
+              (change)="onGallerySelect($event)"
+              accept="image/png, image/jpeg"
+              [disabled]="isCompressing"
+              class="hidden-input"
+            />
+            <div class="dropzone-content">
+              @if (isCompressing) {
+              <div class="spinner"></div>
+              <span>Memproses gambar...</span>
+              } @else {
+              <span class="icon">📂</span>
+              <span class="text">Klik untuk upload foto galeri</span>
+              <span class="sub-text">Maksimal 7 foto (JPG/PNG)</span>
               }
             </div>
+          </label>
+
+          @if (existingGallery.length > 0 || newFiles.length > 0) {
+          <div class="gallery-grid">
+            @for (img of existingGallery; track img.id) {
+            <div class="gallery-item">
+              <img [src]="baseUrl + '/uploads/' + img.filename" alt="Foto" />
+              <button
+                type="button"
+                class="btn-delete"
+                (click)="requestDeletePhoto(img.id)"
+              >
+                ✕
+              </button>
+            </div>
+            } @for (file of newFiles; track file.name; let i = $index) {
+            <div class="gallery-item new-file">
+              <div class="file-placeholder">
+                <span>New</span>
+              </div>
+              <span class="filename">{{ file.name }}</span>
+              <button
+                type="button"
+                class="btn-delete"
+                (click)="removeNewFile(i)"
+              >
+                ✕
+              </button>
+            </div>
+            }
+          </div>
           }
         </div>
       </div>
 
-      <div class="action-buttons">
-        <button type="button" routerLink="/dashboard" class="btn btn-outline">Kembali</button>
-        <button type="submit" [disabled]="form.invalid || isLoading || isCompressing" class="btn btn-primary">
+      <div class="form-actions">
+        <button type="button" routerLink="/dashboard" class="btn btn-secondary">
+          Batal
+        </button>
+        <button
+          type="submit"
+          [disabled]="form.invalid || isLoading || isCompressing"
+          class="btn btn-primary"
+        >
           @if (isLoading) {
-            <span>{{ loadingText }}</span>
+          <span>Menyimpan...</span>
           } @else {
-            <span>Simpan Perubahan</span>
+          <span>Simpan Perubahan</span>
           }
         </button>
       </div>
     </form>
   </div>
 
-  @if (showSizeWarning) {
-    <div class="modal-overlay">
-      <div class="modal-card">
-        <h3 class="text-danger">File Terlalu Besar</h3>
-        <p>Gunakan foto di bawah 2 MB.</p>
-        <button (click)="closeDialogs()" class="btn btn-primary" style="width:100%">OK</button>
+  @if (isEdit && guestbooks.length > 0) {
+  <div class="card-form mt-4">
+    <h3 class="section-title">Komentar & Ucapan</h3>
+    <div class="guestbook-list">
+      @for (gb of guestbooks; track gb.id) {
+      <div class="guestbook-item">
+        <div class="gb-avatar">{{ gb.name.charAt(0) | uppercase }}</div>
+        <div class="gb-content">
+          <div class="gb-header">
+            <strong>{{ gb.name }}</strong>
+            <small>{{ gb.created_at | date:'mediumDate' }}</small>
+          </div>
+          <p>{{ gb.message }}</p>
+        </div>
       </div>
+      }
     </div>
+  </div>
+  } @if (showSizeWarning) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <h3 class="text-danger">File Terlalu Besar</h3>
+      <p>Mohon gunakan foto di bawah 2 MB.</p>
+      <button (click)="closeDialogs()" class="btn btn-primary w-100">
+        Mengerti
+      </button>
+    </div>
+  </div>
+  } @if (showDeleteConfirm) {
+  <app-confirm-dialog
+    itemName="Foto ini"
+    (confirm)="confirmDeletePhoto()"
+    (cancel)="closeDialogs()"
+  >
+  </app-confirm-dialog>
   }
-
-  @if (showDeleteConfirm) {
-    <app-confirm-dialog
-      itemName="Foto ini"
-      (confirm)="confirmDeletePhoto()"
-      (cancel)="closeDialogs()">
-    </app-confirm-dialog>
-  }
-
 </div>

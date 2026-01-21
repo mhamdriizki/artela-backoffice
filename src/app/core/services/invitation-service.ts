@@ -15,7 +15,6 @@ export class InvitationService {
     };
   }
 
-  // --- CRUD Undangan ---
   getAll() {
     return this.http.get(`${this.apiUrl}/api/admin/invitations`, this.getHeaders());
   }
@@ -24,10 +23,12 @@ export class InvitationService {
     return this.http.get(`${this.apiUrl}/api/invitation/${slug}`);
   }
 
+  // Update: Terima data any (bisa FormData)
   create(data: any) {
     return this.http.post(`${this.apiUrl}/api/admin/create`, data, this.getHeaders());
   }
 
+  // Update: Terima data any (bisa FormData)
   update(slug: string, data: any) {
     return this.http.put(`${this.apiUrl}/api/admin/invitation/${slug}`, data, this.getHeaders());
   }
@@ -36,15 +37,12 @@ export class InvitationService {
     return this.http.delete(`${this.apiUrl}/api/admin/invitation/${slug}`, this.getHeaders());
   }
 
-  // --- CRUD Gallery ---
-
   uploadGallery(slug: string, files: File[]) {
     const formData = new FormData();
     files.forEach(f => formData.append('photos', f));
     return this.http.post(`${this.apiUrl}/api/invitation/${slug}/gallery`, formData);
   }
 
-  // UPDATE: ID sekarang String (UUID)
   deleteGalleryImage(id: string) {
     return this.http.delete(`${this.apiUrl}/api/admin/gallery/${id}`, this.getHeaders());
   }

@@ -1,12 +1,5 @@
-import { inject } from '@angular/core';
-import { Router, Routes } from '@angular/router';
-import { AuthService } from './core/services/auth-service';
-
-const authGuard = () => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
-  return auth.isAuthenticated() ? true : router.createUrlTree(['/login']);
-};
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard'; // Import Guard
 
 export const routes: Routes = [
   {
@@ -15,9 +8,8 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [authGuard], // Lindungi semua route di bawah ini
+    canActivate: [authGuard], // PROTEKSI UTAMA DISINI
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard)
@@ -29,7 +21,16 @@ export const routes: Routes = [
       {
         path: 'edit/:slug',
         loadComponent: () => import('./features/invitation-form/invitation-form').then(m => m.InvitationForm)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
       }
     ]
+  },
+  {
+    path: '**',
+    redirectTo: 'login'
   }
 ];
